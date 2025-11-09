@@ -1,101 +1,30 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Search } from 'lucide-react'
+// import { Search } from 'lucide-react'
 import ProductCard from '@/components/product-card'
 import CopyNotification from '@/components/copy-notification'
-import { BadgesBlock } from '@/components/bafges-block'
+import { BadgesBlock } from '@/components/bafges-block' // проверь: не опечатка ли?
+import { BADGES, PRODUCTS } from '@/constant'
+import { UseFilterItems } from '@/hooks/use-filter-items'
 
-// Образцы товаров
-const PRODUCTS = [
-	{
-		id: 1,
-		name: 'Попкорн',
-		description: 'High-quality sound with noise cancellation',
-		price: 129.99,
-		sku: 'SKU-WH-001',
-		category: 'popcorn',
-		image: '/wireless-headphones.png',
-	},
-	{
-		id: 2,
-		name: 'Bcaa',
-		description: 'Quick charging technology, universal compatibility',
-		price: 24.99,
-		sku: 'SKU-CH-002',
-		category: 'sport',
-		image: '/usb-charger.jpg',
-	},
-	{
-		id: 3,
-		name: 'Картонки',
-		description: '20000mAh capacity, dual USB ports',
-		price: 39.99,
-		sku: 'SKU-PB-003',
-		category: 'cartons',
-		image: '/portable-power-bank.png',
-	},
-	{
-		id: 4,
-		name: 'Кофе колдбрю',
-		description: 'Waterproof, 360° sound, 12-hour battery',
-		price: 79.99,
-		sku: 'SKU-BS-004',
-		category: 'coffee',
-		image: '/bluetooth-speaker.jpg',
-	},
-	{
-		id: 5,
-		name: 'Сладкая вата',
-		description: 'Tempered glass, easy installation',
-		price: 9.99,
-		sku: 'SKU-SP-005',
-		category: 'vata',
-		image: '/screen-protector.png',
-	},
-	{
-		id: 6,
-		name: 'Спреи',
-		description: 'Ergonomic design, precision tracking',
-		price: 34.99,
-		sku: 'SKU-MS-006',
-		category: 'spay',
-		image: '/wireless-mouse.png',
-	},
-	{
-		id: 7,
-		name: 'Ароматизированные бочки',
-		description: 'Adjustable height, aluminum construction',
-		price: 44.99,
-		sku: 'SKU-LS-007',
-		category: 'bochki',
-		image: '/laptop-stand.png',
-	},
-	{
-		id: 8,
-		name: 'Ароматизированные мешки',
-		description: '7-port expansion, high-speed data transfer',
-		price: 49.99,
-		sku: 'SKU-UH-008',
-		category: 'meshki',
-		image: '/usb-hub.png',
-	},
-]
 
 export default function Home() {
 	const [searchQuery, setSearchQuery] = useState('')
 	const [copiedSku, setCopiedSku] = useState<string | null>(null)
+	const [badges, setBadges] = useState(BADGES)
 
-	const filteredProducts = useMemo(() => {
-		return PRODUCTS.filter(product => {
-			const query = searchQuery.toLowerCase()
-			return (
-				product.name.toLowerCase().includes(query) ||
-				product.description.toLowerCase().includes(query) ||
-				product.sku.toLowerCase().includes(query)
+	// переключение чекбокса у бэйджа
+	const toggle = (category: string) => {
+		setBadges(prev =>
+			prev.map(b =>
+				b.category === category ? { ...b, checked: !b.checked } : b
 			)
-		})
-	}, [searchQuery])
+		)
+	}
+
+	// Set выбранных категорий — вычисляем из состояния бэйджей
+	const { filteredProducts } = UseFilterItems(searchQuery, PRODUCTS, badges)
 
 	const handleCopySku = (sku: string) => {
 		navigator.clipboard.writeText(sku)
@@ -108,18 +37,17 @@ export default function Home() {
 			{/* Header */}
 			<header className='flex-shrink-0 border-b border-border px-4 py-4 bg-card'>
 				<div className='flex items-center gap-2'>
-					<h1 className='text-xl font-bold text-primary'>ShopHub</h1>
+					<h1 className='text-xl font-bold text-primary'>TK "Marsho"</h1>
 				</div>
-				<p className='text-xs text-muted-foreground mt-1'>
-					Browse our collection
-				</p>
+				<p className='text-xs text-muted-foreground mt-1'>Доверяй качеству</p>
 			</header>
 
-			{/* Search Bar */}
+			{/* Search + Badges */}
 			<div className='flex-shrink-0 px-4 py-3 bg-secondary border-b border-border'>
 				<div className='relative'>
-					<Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground' />
 					<input
+						maxLength={40}
+						enterKeyHint='enter'
 						type='text'
 						placeholder='Search products...'
 						value={searchQuery}
@@ -127,7 +55,7 @@ export default function Home() {
 						className='w-full pl-10 pr-4 py-2 rounded-lg bg-background text-foreground border border-input focus:outline-none focus:ring-2 focus:ring-primary'
 					/>
 				</div>
-				<BadgesBlock />
+				<BadgesBlock badges={badges} toggle={toggle} />
 			</div>
 
 			{/* Products Grid */}

@@ -21,11 +21,11 @@ const obj = [{
 ]
 
 
-function getTargets(arr, search = '') {
+function getTargets(arr, badges = '', search='') {
 
-  const newSearch = search.trim().toLowerCase().split(',')
+  const newBadges = badges.trim().toLowerCase().split(',')
 
-  const newSet = new Set(newSearch.map((target) => target.trim().toLowerCase()).filter(Boolean))
+  const newSet = new Set(newBadges.map((target) => target.trim().toLowerCase()).filter(Boolean))
 
   console.log(newSet)
 

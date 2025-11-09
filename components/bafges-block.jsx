@@ -1,21 +1,17 @@
 'use client'
 import { useState } from "react";
-import { BADGES } from "@/constant";
 import { Badge } from "@/components/ui/badge";
 
-export const BadgesBlock = () => {
-  const [items, setItems] = useState(BADGES);
+export const BadgesBlock = ({ badges, toggle }) => {
 
-  const toggle = (category) => {
-    setItems((prev) =>
-      prev.map((b) => (b.category === category ? { ...b, checked: !b.checked } : b))
-    );
-  };
+
 
   // показываем отмеченные первыми
-  const ordered = [...items].sort((a, b) =>
+  const ordered = [...badges].sort((a, b) =>
     a.checked === b.checked ? 0 : a.checked ? -1 : 1
   );
+
+
 
   return (
     <div className="flex gap-3 flex-wrap mt-4 max-h-[90px] overflow-auto">
